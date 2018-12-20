@@ -426,7 +426,8 @@ def overview_by_book(request, id):
     # 得到全部文摘
     clipping_all = User_Clipping.objects\
         .filter(user_id=request.user.id)\
-        .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name', 'clipping__book__author', 'clipping__book_id')
+        .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
+                'clipping__book__author', 'clipping__book_id', 'clipping_id')
 
     author_book = {}
     clipping_book = []
