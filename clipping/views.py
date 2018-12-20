@@ -23,7 +23,7 @@ class Img():
     def __init__(self, save_dir=None):
         self.save_dir = save_dir
 
-        self.font_family = 'static/方正清刻本悦宋简体.TTF'.encode("utf-8")
+        self.font_family = 'static/FZQingKeBenYueSong.TTF'
         self.font_size = 20  # 字体大小
         self.line_space = 20  # 行间隔大小
         self.word_space = 5
