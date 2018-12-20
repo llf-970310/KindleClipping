@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    {% for field in form %}
+        {% if field.errors %}
+            <script>M.toast({html: '{{ field.errors }}'});</script>
+        {% endif %}
+    {% endfor %}
+
+    <div class="container">
+        <h3>注册</h3>
+        <form class="form" action="{% url 'register' %}" method="post" style="margin-top: 30px;">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="input-field" style="margin-top: 30px;">
+                    {{ field }}
+                    {{ field.label_tag }}
+                    {% if field.help_text %}
+                        <span class="helper-text" data-error="wrong" data-success="right">{{ field.help_text|safe }}</span>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button class="btn waves-effect waves-light" type="submit" name="action">注册</button>
+            <button class="btn waves-effect waves-light" type="button" onclick="window.location.href='{% url 'login' %}' ">已有账户登录</button>
+        </form>
+    </div>
+
+{% endblock %}

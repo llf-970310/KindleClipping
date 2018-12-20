@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="container" style="position: relative;width: 1000px;height: 500px;">
+        <canvas id="clippingNumChart"></canvas>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>
+    <script>
+        $(function () {
+            getClippingNumChart();
+        });
+
+        function getClippingNum(year) {
+            var nums = [];
+            $.ajax({
+                url: '/clipping/statistics/clippingNum/' + year,
+                type: 'GET',
+                dataType: 'json',
+                async: false,
+                success: function (result) {
+                    if (result.success) {
+                        nums = result.data;
+                    } else {
+                        M.toast({html: year + "年数据读取错误"});
+                    }
+                },
+                error: function () {
+
+                }
+            });
+            return nums;
+        }
+
+        function getClippingNumChart() {
+            var currentYear = new Date().getFullYear();
+            var clippingNum = [];
+            clippingNum[0] = getClippingNum(currentYear);
+            clippingNum[1] = getClippingNum(currentYear-1);
+            clippingNum[2] = getClippingNum(currentYear-2);
+
+            var ctx = document.getElementById("clippingNumChart").getContext('2d');
+            var MONTHS = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: MONTHS,
+                    datasets: [{
+                        label: currentYear + '年文摘数量',
+                        data: clippingNum[0],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        fill: false
+                    }, {
+                        label: currentYear - 1 + '年文摘数量',
+                        data: clippingNum[1],
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        borderColor: 'rgba(255, 206, 86, 1)',
+                        fill: false
+                    }, {
+                        label: currentYear - 2 + '年文摘数量',
+                        data: clippingNum[2],
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: '文摘数量统计'
+                    },
+                    tooltips: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    hover: {
+                        mode: 'nearest',
+                        intersect: true
+                    },
+                    scales: {
+                        xAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Month'
+                            }
+                        }],
+                        yAxes: [{
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Value'
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+    </script>
+{% endblock %}

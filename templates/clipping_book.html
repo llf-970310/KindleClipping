@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    <div class="row" style="margin-top: 30px;">
+        <div class="col m3 hide-on-small-only">
+            <div style="width: 21%">
+                <div class="card pinned" style="width: inherit;margin: 7px 0 0 60px;">
+                    <div class="card-image">
+                        <img src="{{ book_info.img }}" onerror="this.src='{{ book_info.img_backup }}'" style="max-height: 400px;"/>
+                        <a class="btn-floating btn-large halfway-fab waves-effect waves-light red activator"><i
+                                class="material-icons">link</i></a>
+                    </div>
+                    <div class="card-content">
+                        <span class="card-title">{{ book_info.book_name }}</span>
+                        <p>{{ book_info.author }}</p><br>
+                        {% for tag in book_info.tags %}
+                            <div class="chip">{{ tag }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="card-reveal">
+                        <span class="card-title grey-text text-darken-4">内容简介<i
+                                class="material-icons right">close</i></span>
+                        <p>{{ book_info.summary }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col m1"></div>
+        <div class="col m6">
+            {% for clipping in clippings %}
+                <div class="card grey lighten-3 hoverable">
+                    <div class="card-content">
+                        <span class="card-title">{{ clipping.clipping__book__book_name }}</span>
+                        <blockquote>{{ clipping.clipping__content }}</blockquote>
+                        <div class="valign-wrapper right">
+                            <i class="tiny material-icons">person</i>&nbsp;
+                            <span>{{ clipping.clipping__book__author }}</span>
+                        </div><br>
+                        <div class="valign-wrapper right">
+                            <i class="tiny material-icons">bookmark</i>&nbsp;
+                            <span>位置 {{ clipping.clipping__location }}</span>
+                        </div><br>
+                        <div class="valign-wrapper right">
+                            <i class="tiny material-icons">access_time</i>&nbsp;
+                            <span>{{ clipping.time }}</span>
+                        </div>
+                    </div>
+                    <div class="card-action">
+                        <a href="{% url 'export' clipping.clipping_id %}">导出</a>
+                        <a href="#del-modal" class="modal-trigger" onclick="setClippingID({{ clipping.clipping_id }})">删除</a>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <ul class="pagination">
+                <span class="step-links">
+                    {% if clippings.has_previous %}
+                        <li class="waves-effect"><a href="?page={{ clippings.previous_page_number }}"><i class="material-icons">chevron_left</i></a></li>
+                    {% else %}
+                        <li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+                    {% endif %}
+
+                    {% for num in clippings.paginator.page_range %}
+                        {% if num == clippings.number %}
+                            <li class="active"><a href="?page={{ num }}">{{ num }}</a></li>
+                        {% else %}
+                            <li class="waves-effect"><a href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if clippings.has_next %}
+                        <li class="waves-effect"><a href="?page={{ clippings.next_page_number }}"><i class="material-icons">chevron_right</i></a></li>
+                    {% else %}
+                        <li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+                    {% endif %}
+                </span>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Del Modal Structure -->
+    <div id="del-modal" class="modal">
+        <div class="modal-content">
+            <h4><i class="small material-icons">warning</i>&nbsp;删除确认</h4>
+            <p>确认要删除本条文摘吗？</p>
+            <input type="hidden" id="clippingID">
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect btn-flat">取消</a>
+            <a onclick="delClipping()" class="waves-effect btn-flat">确认</a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(document).ready(function () {
+            $('.sidenav').sidenav();
+            $('.collapsible').collapsible();
+            $('.modal').modal();
+        });
+
+        function setClippingID(id) {
+            $('#clippingID').val(id);
+        }
+
+        $.ajaxSetup({
+            data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
+        });
+
+        function delClipping() {
+            $.ajax({
+                url: "{% url 'del_clipping' %}",
+                type: 'POST',
+                data: {
+                    'id': $('#clippingID').val()
+                },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.success) {
+                        $("#del-modal").modal("close");
+                        M.toast({html: '删除成功!'});
+                        setTimeout("window.location.reload()", 800);
+                    } else {
+                        $("#del-modal").modal("close");
+                        M.toast({html: '删除失败!'});
+                    }
+                },
+                error: function () {
+                    console.log("Ajax ERROR!")
+                }
+            })
+        }
+    </script>
+{% endblock %}

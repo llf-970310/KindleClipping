@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{#{% block content %}#}
+{#    {% for book in book_list %}#}
+{#        <a href="{% url 'book_clipping' book.clipping__book_id %}">{{ book.clipping__book__book_name }}    {{ book.clipping__book__author }}</a><br>#}
+{#    {% endfor %}#}
+{#{% endblock %}#}
+
+{% block content %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/component.css' %}" />
+    <script src="{% static 'js/snap.svg-min.js' %}"></script>
+    <!--[if IE]>
+        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <div class="container">
+        <section id="grid" class="grid clearfix">
+            {% for book in book_list %}
+                {% if book.clipping__book__book_name|length > 10 %}
+                    <a href="{% url 'book_clipping' book.clipping__book_id %}" data-path-hover="m 180,68 -180,0 L 0,0 180,0 z">
+                {% else %}
+                    <a href="{% url 'book_clipping' book.clipping__book_id %}" data-path-hover="m 180,45 -180,0 L 0,0 180,0 z">
+                {% endif %}
+                    <figure>
+                        <img src="{{ book.img }}" onerror="this.src='{{ book.img_backup }}'"/>
+                        <svg viewBox="0 0 180 320" preserveAspectRatio="none"><path d="M 180,160 0,218 0,0 180,0 z"/></svg>
+                        <figcaption>
+                            <h2>{{ book.clipping__book__book_name }}</h2>
+                            <p>{{ book.clipping__book__author }}</p>
+                            <button>View</button>
+                        </figcaption>
+                    </figure>
+                </a>
+            {% endfor %}
+        </section>
+    </div><!-- /container -->
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        (function() {
+            function init() {
+                var speed = 250,
+                    easing = mina.easeinout;
+
+                [].slice.call ( document.querySelectorAll( '#grid > a' ) ).forEach( function( el ) {
+                    var s = Snap( el.querySelector( 'svg' ) ), path = s.select( 'path' ),
+                        pathConfig = {
+                            from : path.attr( 'd' ),
+                            to : el.getAttribute( 'data-path-hover' )
+                        };
+
+                    el.addEventListener( 'mouseenter', function() {
+                        path.animate( { 'path' : pathConfig.to }, speed, easing );
+                    } );
+
+                    el.addEventListener( 'mouseleave', function() {
+                        path.animate( { 'path' : pathConfig.from }, speed, easing );
+                    } );
+                } );
+            }
+            init();
+        })();
+    </script>
+{% endblock %}

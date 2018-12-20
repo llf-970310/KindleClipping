@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Kindle书摘管理{% endblock %}
+
+{% block content %}
+    <div class="wrap">
+        <div class="tile">
+            <div class="text">
+                <h1>上传文件</h1>
+                <a href="#upload" class="modal-trigger"><img src="{% static 'img/a.png' %}"></a>
+                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork chicken meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+            </div>
+        </div>
+
+        <div class="tile">
+            <div class="text">
+                <h1>总览</h1>
+                <a href="{% url 'overview' %}"><img src="{% static 'img/b.jpg' %}"></a>
+                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork
+                    chicken meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+            </div>
+        </div>
+
+        <div class="tile">
+            <div class="text">
+                <h1>书籍库</h1>
+                <a href="{% url 'book' %}"><img src="{% static 'img/c.jpg' %}"></a>
+                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork
+                    chicken meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+            </div>
+        </div>
+
+        <div class="tile">
+            <div class="text">
+                <h1>阅读统计</h1>
+                <a href="{% url 'statistics' %}"><img src="{% static 'img/d.png' %}"></a>
+                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork
+                    chicken
+                    meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="upload" class="modal">
+        <div class="modal-content">
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>选择文件</span>
+                    <input type="file" name="file" id="file_upload">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="请上传 Documents 文件夹下的 My Clippings.txt">
+                </div>
+                <div class="progress" id="progress" style="display: none;">
+                    <div class="indeterminate"></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn waves-effect waves-light" type="submit" onclick="upload()">
+                上传<i class="material-icons right">send</i>
+            </button>
+        </div>
+    </div>
+
+    <link type="text/css" rel="stylesheet" href="{% static 'css/hover.css' %}"/>
+
+{% endblock %}
+
+{% block js %}
+    <script>
+        $(document).ready(function(){
+            $('.modal').modal();
+        });
+
+        function upload() {
+            var form_data = new FormData();
+            var file_info =$('#file_upload')[0].files[0];
+            form_data.append('file',file_info);
+            $("#progress").show();
+            $.ajax({
+                url: '/clipping/upload/',
+                type: 'POST',
+                data: form_data,
+                processData: false,  // tell jquery not to process the data
+                contentType: false, // tell jquery not to set contentType
+                success: function(data) {
+                    if (data === "success") {
+                        M.toast({html: '上传成功!'});
+                        setTimeout("window.location.href='/clipping/'",1500);
+                    } else if (data === "error") {
+                        M.toast({html: '请选择要上传的文件!'});
+                        $("#progress").hide();
+                    } else if (data === "nouser") {
+                        M.toast({html: '请先登录!'});
+                        $("#progress").hide();
+                    }
+                },
+                error: function() {
+
+                }
+            });
+        }
+    </script>
+{% endblock %}

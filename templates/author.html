@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+    {% for author in author_list %}
+        <a href="">{{ author.clipping__book__author }}</a><br>
+    {% endfor %}
+{% endblock %}

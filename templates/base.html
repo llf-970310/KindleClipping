@@ -1,0 +1,80 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}" media="screen,projection" />
+    <title>{% block title %} {% endblock %}</title>
+</head>
+<body>
+    <div class="navbar-fixed">
+        <nav>
+            <div class="nav-wrapper blue">
+                <a href="{% url 'index' %}" class="brand-logo" style="margin-left: 10px;"><i class="material-icons">import_contacts</i>Kindle书摘管理</a>
+                <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+                <ul id="nav" class="right hide-on-med-and-down">
+                    <li id="overview"><a href="{% url 'overview' %}">总览</a></li>
+                    <li id="book"><a href="{% url 'book' %}">书籍库</a></li>
+{#                    <li id="author"><a href="{% url 'author' %}">作家</a></li>#}
+                    {% if user.is_authenticated %}
+                    <li><a class="dropdown-trigger" href="#" data-target="user_dropdown">{{ user.username }}<i class="material-icons right">more_vert</i></a></li>
+                    {% else %}
+                    <li><a class="waves-effect waves-light btn" href="{% url 'login' %}?next={{ request.path }}"><i class="material-icons right">assignment_ind</i>登录</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+    </div>
+
+    <ul id="nav-mobile" class="sidenav">
+        <li id="overview"><a href="{% url 'overview' %}">总览</a></li>
+        <li id="book"><a href="{% url 'book' %}">书籍库</a></li>
+        {% if user.is_authenticated %}
+            <li><a class="waves-effect waves-light btn" href="{% url 'logout' %}?next={{ request.path }}">注销</a></li>
+        {% else %}
+            <li><a class="waves-effect waves-light btn" href="{% url 'login' %}?next={{ request.path }}">登录</a></li>
+        {% endif %}
+    </ul>
+
+    <!-- Dropdown Structure -->
+    <ul id="user_dropdown" class="dropdown-content">
+        <li><a href="#!">修改密码</a></li>
+        <li class="divider"></li>
+        <li><a href="{% url 'logout' %}?next={{ request.path }}">注销</a></li>
+    </ul>
+
+    {% block content %} {% endblock %}
+    {% block js %}{% endblock %}
+
+    <script>
+        $(function () {
+            $(".dropdown-trigger").dropdown({
+                coverTrigger: false
+            });
+            $('.sidenav').sidenav();
+
+            var title = $(document).attr("title");
+            if (title === "总览") {
+                $("#overview").addClass("active");
+            } else if (title === "书籍库") {
+                $("#book").addClass("active");
+            } else if (title === "作者库") {
+                $("#author").addClass("active");
+            }
+        })
+    </script>
+
+    <style>
+        @media screen and (max-width: 768px) {
+            nav .brand-logo {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</body>
+</html>
