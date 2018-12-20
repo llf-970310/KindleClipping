@@ -4,7 +4,7 @@ from .models import Clipping, User_Clipping, Book
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
 import locale
-import re
+import re, sys, codecs
 import json
 import os
 from datetime import datetime
@@ -16,6 +16,12 @@ import requests
 from lxml import etree
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+
+# 切换输出流编码为utf-8
+if sys.stdout.encoding != 'UTF-8':
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+if sys.stderr.encoding != 'UTF-8':
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
 
 # 分享图片生成类
 class Img():

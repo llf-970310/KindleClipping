@@ -44,8 +44,8 @@
                             {{ form.password }}
                             {{ form.password.label_tag }}
                         </div>
-                        <button class="btn waves-effect waves-light blue" type="button"
-                                onclick="window.location.href='{% url 'register' %}' " style="margin-left: 310px">注册</button>
+                        <button class="btn waves-effect waves-light blue" type="button" id="signUp"
+                                onclick="window.location.href='{% url 'register' %}' ">注册</button>
                         <button class="btn waves-effect waves-light blue" type="submit" name="action">登录</button>
                         <input type="hidden" name="next" value="{{ next }}"/>
                     </form>
@@ -55,6 +55,16 @@
     </div>
 
     <style>
+        #signUp {
+            margin-left: 310px;
+        }
+
+        @media screen and (max-width: 768px) {
+            #signUp {
+                margin-left: 90px;
+            }
+        }
+
         body {
             background-color: #fafafa;
         }
