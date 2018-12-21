@@ -30,7 +30,12 @@
     <div class="row" style="margin-top: 30px;">
         <div class="col m3">
             <div class="fixed-action-btn">
-                <a class="btn-floating btn-large waves-effect waves-light blue sidenav-trigger z-depth-3" data-target="slide-out" ><i class="material-icons">menu</i></a>
+                <a class="btn-floating btn-large waves-effect waves-light blue sidenav-trigger z-depth-3"
+                   data-target="slide-out"><i class="material-icons">menu</i></a>
+            </div>
+            <div class="fixed-action-btn" style="margin-bottom: 80px;">
+                <a class="btn-floating btn-large waves-effect waves-light red z-depth-3 modal-trigger"
+                   href="#add-modal"><i class="material-icons">add</i></a>
             </div>
         </div>
         <div class="col m6 s12">
@@ -87,6 +92,19 @@
 
     <!-- Del Modal Structure -->
     <div id="del-modal" class="modal">
+        <div class="modal-content">
+            <h4><i class="small material-icons">warning</i>&nbsp;删除确认</h4>
+            <p>确认要删除本条文摘吗？</p>
+            <input type="hidden" id="clippingID">
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect btn-flat">取消</a>
+            <a onclick="delClipping()" class="waves-effect btn-flat">确认</a>
+        </div>
+    </div>
+
+    <!-- Add Modal Structure -->
+    <div id="add-modal" class="modal">
         <div class="modal-content">
             <h4><i class="small material-icons">warning</i>&nbsp;删除确认</h4>
             <p>确认要删除本条文摘吗？</p>
