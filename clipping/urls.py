@@ -3,7 +3,8 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('upload/', views.upload, name='upload'),
+    path('upload_clipping/', views.upload_clipping, name='upload_clipping'),
+    path('upload_img/', views.upload_img, name='upload_img'),
     path('overview/', views.overview, name='overview'),
     path('overview/<int:id>', views.overview_by_book, name='overview_book'),
     path('export/<int:clipping_id>', views.export_clipping, name='export'),

@@ -16,6 +16,7 @@ import requests
 from lxml import etree
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
+from aip import AipOcr
 
 # 切换输出流编码为utf-8
 if sys.stdout.encoding != 'UTF-8':
@@ -258,21 +259,7 @@ def register(request):
     return render(request, 'register.html', context={'form': form, 'title': '用户注册'})
 
 @csrf_exempt
-def upload(request):
-    def upload_file():
-        if request.method == "POST":  # 请求方法为POST时，进行处理
-            myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
-            if not myFile:
-                return False
-            else:
-                global file_name
-                file_name = myFile.name
-                destination = open('./upload_file/' + myFile.name, 'wb+')  # 打开特定的文件进行二进制的写操作
-                for chunk in myFile.chunks():  # 分块写入文件
-                    destination.write(chunk)
-                destination.close()
-                return True
-
+def upload_clipping(request):
     if request.user.id is None:
         return HttpResponse("nouser")
 
@@ -334,7 +321,7 @@ def upload(request):
     # else:
     #     return HttpResponse('error')
 
-    if upload_file():
+    if upload_file(request):
         locale.setlocale(locale.LC_ALL, 'zh_CN')
         rfile = open('./upload_file/' + file_name, 'r', encoding="utf-8-sig")
         i = count = 0
@@ -402,6 +389,39 @@ def upload(request):
         return HttpResponse('success')
     else:
         return HttpResponse('error')
+
+@login_required
+@csrf_exempt
+def upload_img(request):
+    result = {}
+    # 百度OCR SDK
+    APP_ID = '15237015'
+    API_KEY = 'QIVHjXVrZGq8IjSypyERPukB'
+    SECRET_KEY = 'lOMPmpyVyeCdB5SbLxAGK8c8srrFUDbl'
+
+    client = AipOcr(APP_ID, API_KEY, SECRET_KEY)
+    if upload_file(request):
+        # 图片路径
+        file_path = './upload_file/' + file_name
+        # 可选参数
+        options = {}
+        options["language_type"] = "CHN_ENG"
+        options["detect_direction"] = "true"
+        options["detect_language"] = "true"
+        options["probability"] = "false"
+        words_result = client.basicGeneral(get_file_content(file_path), options)
+        if "error_code" in words_result:
+            result = {"success": False, "type": 2} # 1为上传错误，2为解析错误
+            print("OCR识别错误，错误原因为：" + words_result['error_msg'])
+        else:
+            words_result = words_result['words_result']
+            content = ""
+            for item in words_result:
+                content += item['words']
+            result = {"success": True, "content": content}
+    else:
+        result = {"success": False, "type": 1}
+    return HttpResponse(json.dumps(result), content_type="application/json")
 
 @login_required
 def overview(request):
@@ -551,6 +571,24 @@ def author(request):
 def statistics(request):
     context = {'title': '阅读统计'}
     return render(request, 'statistics.html', context)
+
+def upload_file(request):
+    if request.method == "POST":  # 请求方法为POST时，进行处理
+        myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
+        if not myFile:
+            return False
+        else:
+            global file_name
+            file_name = myFile.name
+            destination = open('./upload_file/' + myFile.name, 'wb+')  # 打开特定的文件进行二进制的写操作
+            for chunk in myFile.chunks():  # 分块写入文件
+                destination.write(chunk)
+            destination.close()
+            return True
+
+def get_file_content(filePath):
+    with open(filePath, 'rb') as fp:
+        return fp.read()
 
 def get_ua():
     with open("./static/UA_list.txt") as fileua:
