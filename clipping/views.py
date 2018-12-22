@@ -491,7 +491,7 @@ def book(request):
         else:
             ASIN = get_ASIN(book_name)
             Book.objects.filter(id=book['clipping__book_id']).update(ASIN=ASIN)
-        book['img_backup'] = "http://z2-ec2.images-amazon.com/images/P/%s.01.MAIN._SCRM_.jpg" % ASIN
+        book['img_backup'] = "http://z2-ec2.images-amazon.com/images/P/%s.jpg" % ASIN
         book['img'] = "http://s3.cn-north-1.amazonaws.com.cn/sitbweb-cn/content/%s/images/cover.jpg" % ASIN
     context = {'book_list': book_list, 'title': '书籍库'}
     return render(request, 'book.html', context)
@@ -510,7 +510,7 @@ def view_by_book(request, book_id):
 
     # get book image
     ASIN = book_info['ASIN']
-    book_info['img_backup'] = "http://z2-ec2.images-amazon.com/images/P/%s.01.MAIN._SCRM_.jpg" % ASIN
+    book_info['img_backup'] = "http://z2-ec2.images-amazon.com/images/P/%s.jpg" % ASIN
     book_info['img'] = "http://s3.cn-north-1.amazonaws.com.cn/sitbweb-cn/content/%s/images/cover.jpg" % ASIN
 
     # get book summary
