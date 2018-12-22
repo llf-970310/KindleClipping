@@ -3,6 +3,7 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
+    <!-- 左侧栏 -->
     <ul id="slide-out" class="sidenav" style="width: 350px;">
         <li><a href="{% url 'overview' %}">全部</a></li>
         <li class="no-padding">
@@ -28,6 +29,7 @@
     </ul>
 
     <div class="row" style="margin-top: 30px;">
+        <!-- 右下菜单与添加按钮 -->
         <div class="col m3">
             <div class="fixed-action-btn">
                 <a class="btn-floating btn-large waves-effect waves-light blue sidenav-trigger z-depth-3"
@@ -38,7 +40,10 @@
                    href="#add-modal"><i class="material-icons">add</i></a>
             </div>
         </div>
+
+        <!-- 主体 -->
         <div class="col m6 s12">
+            <!-- 文摘内容 -->
             {% for clipping in clippings %}
                 <div class="card grey lighten-3 hoverable">
                     <div class="card-content">
@@ -64,6 +69,7 @@
                 </div>
             {% endfor %}
 
+            <!-- 分页 -->
             <ul class="pagination">
                 <span class="step-links">
                     {% if clippings.has_previous %}
@@ -107,50 +113,47 @@
     <div id="add-modal" class="modal modal-fixed-footer">
         <div class="modal-content">
             <h4>添加书摘</h4>
-            <form action="">
-                {% csrf_token %}
-                <div class="row">
-                    <div class="input-field col m6 s12">
-                        <i class="material-icons prefix">book</i>
-                        <input id="book_name" type="text" class="validate">
-                        <label for="book_name">书名</label>
-                    </div>
-                    <div class="input-field col m6 s12">
-                        <i class="material-icons prefix">account_circle</i>
-                        <input id="author" type="text" class="validate">
-                        <label for="author">作者</label>
-                    </div>
+            <div class="row">
+                <div class="input-field col m6 s12">
+                    <i class="material-icons prefix">book</i>
+                    <input id="book_name" type="text" class="validate">
+                    <label for="book_name">书名</label>
                 </div>
-                <div class="row">
-                    <div class="input-field col m12">
-                        <i class="material-icons prefix">speaker_notes</i>
-                        <textarea id="content" class="materialize-textarea"></textarea>
-                        <label for="content">内容</label>
-                    </div>
+                <div class="input-field col m6 s12">
+                    <i class="material-icons prefix">account_circle</i>
+                    <input id="author" type="text" class="validate">
+                    <label for="author">作者</label>
                 </div>
-                <div class="row">
-                    <div class="input-field col m12">
-                        <i class="material-icons prefix">place</i>
-                        <input id="position" type="text" class="validate">
-                        <label for="position">位置</label>
-                    </div>
+            </div>
+            <div class="row">
+                <div class="input-field col m12">
+                    <i class="material-icons prefix">speaker_notes</i>
+                    <textarea id="content" class="materialize-textarea"></textarea>
+                    <label for="content">内容</label>
                 </div>
-                <div class="row">
-                    <div class="file-field input-field col m12">
-                    <div class="btn">
-                        <span>File</span>
-                        <input type="file" id="ocr_img">
-                    </div>
-                    <div class="file-path-wrapper">
-                        <input class="file-path validate" type="text" placeholder="如需使用OCR识别，请选择图片后点击上传。">
-                    </div>
+            </div>
+            <div class="row">
+                <div class="input-field col m12">
+                    <i class="material-icons prefix">place</i>
+                    <input id="position" type="text" class="validate">
+                    <label for="position">位置</label>
                 </div>
+            </div>
+            <div class="row">
+                <div class="file-field input-field col m12">
+                <div class="btn">
+                    <span>File</span>
+                    <input type="file" id="ocr_img">
                 </div>
-            </form>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="如需使用OCR识别，请选择图片后点击识别。">
+                </div>
+            </div>
+            </div>
         </div>
         <div class="modal-footer">
             <a href="#!" class="modal-close waves-effect btn-flat">取消</a>
-            <a onclick="OCR()" class="waves-effect btn-flat">上传</a>
+            <a onclick="OCR()" class="waves-effect btn-flat">识别</a>
             <a onclick="addClipping()" class="waves-effect btn-flat">确认</a>
         </div>
     </div>
@@ -171,6 +174,42 @@
         $.ajaxSetup({
             data: {csrfmiddlewaretoken: '{{ csrf_token }}'},
         });
+
+        function addClipping() {
+            if ($('#book_name').val().trim() == "") {
+                M.toast({html: '请填写书籍名!'});
+                return;
+            }
+            if ($('#content').val().trim() == "") {
+                M.toast({html: '请填写内容!'});
+                return;
+            }
+            $.ajax({
+                url: "{% url 'add_clipping' %}",
+                type: 'POST',
+                data: {
+                    'book_name': $('#book_name').val(),
+                    'author': $('#author').val(),
+                    'content': $('#content').val(),
+                    'position': $('#position').val()
+                },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.success) {
+                        $("#add-modal").modal("close");
+                        M.toast({html: '添加成功!'});
+                        setTimeout("window.location.reload()", 800);
+                    } else {
+                        $("#add-modal").modal("close");
+                        M.toast({html: '添加失败!'});
+                    }
+                },
+                error: function () {
+                    console.log("Ajax ERROR!")
+                }
+            })
+        }
 
         function delClipping() {
             $.ajax({

@@ -374,7 +374,7 @@ def upload_clipping(request):
                 count = 4
                 if flag:
                     # print(clipping)
-                    book_tmp = Book.objects.get_or_create(book_name=book['name'], author=book['author'])
+                    book_tmp = Book.objects.get_or_create(book_name=book['name'], defaults={'author': book['author']})
                     # clip = Clipping.objects.get_or_create(content=clipping['content'], book_name=clipping['name'], location=clipping['location'])
                     # 有隐患，同一位置后面上传的用户会把前面用户的内容替换掉，当前无法解决此问题
                     clip = Clipping.objects.update_or_create(book_id=book_tmp[0].id, location=clipping['location'], defaults={'content': clipping['content']})
@@ -549,6 +549,26 @@ def export_clipping(request, clipping_id):
     return response
 
 @login_required
+def add_clipping(request):
+    book_name = request.POST.get('book_name').strip()
+    author = request.POST.get('author').strip()
+    content = request.POST.get('content').strip()
+    position = request.POST.get('position').strip()
+    add_time = datetime.now()
+
+    try:
+        book = Book.objects.get_or_create(book_name=book_name, defaults={'author': author})
+        clip = Clipping.objects.update_or_create(book_id=book[0].id, location=position,
+                                                 defaults={'content': content})
+        User_Clipping.objects.update_or_create(user_id=request.user.id, clipping_id=clip[0].id,
+                                               defaults={'time': add_time})
+        result = {'success': True}
+    except Exception as e:
+        result = {'success': False}
+        print(repr(e))
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+@login_required
 def del_clipping(request):
     clipping_id = request.POST.get('id')
     try:
@@ -612,7 +632,7 @@ def get_ASIN(book_name):
     with requests.session() as s:
         req = s.get('https://www.amazon.cn/', headers=header)
         cookie = requests.utils.dict_from_cookiejar(req.cookies)
-    url = "https://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=亚马逊网站&url=node%3D116169071&field-keywords=" + book_name
+    url = "https://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=亚马逊网站&url=search-alias%3Ddigital-text&field-keywords=" + book_name
     data = requests.get(url=url, cookies=cookie, headers=header)
     data.encoding = 'utf-8'
     s = etree.HTML(data.text)
