@@ -533,7 +533,7 @@ def export_clipping(request, clipping_id):
     ASIN = clipping['book__ASIN']
     img_url = [
         "http://s3.cn-north-1.amazonaws.com.cn/sitbweb-cn/content/%s/images/cover.jpg" % ASIN,
-        "http://z2-ec2.images-amazon.com/images/P/%s.01.MAIN._SCRM_.jpg" % ASIN
+        "http://z2-ec2.images-amazon.com/images/P/%s.jpg" % ASIN
     ]
     content = clipping['content']
     # 每25个字插入一个换行符，以适应分享图片的生成
