@@ -128,6 +128,8 @@ STATICFILES_DIRS = (
     os.path.join(BASE_DIR,'static'),
 )
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_all')
+
 TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
 
 LOGOUT_REDIRECT_URL = '/clipping'
