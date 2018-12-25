@@ -12,6 +12,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Q
 import requests
 from lxml import etree
 from PIL import Image, ImageDraw, ImageFont
@@ -425,11 +426,20 @@ def upload_img(request):
 
 @login_required
 def overview(request):
-    clipping_list = User_Clipping.objects\
-        .filter(user_id=request.user.id)\
-        .order_by("-time")\
-        .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
-                'clipping__book__author', 'clipping__book_id', 'clipping_id')
+    if request.method == "POST":
+        keyword = request.POST.get("keyword")
+        clipping_list = User_Clipping.objects\
+            .filter(Q(user_id=request.user.id),
+                    Q(clipping__content__contains=keyword) | Q(clipping__book__book_name__contains=keyword))\
+            .order_by("-time")\
+            .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
+                    'clipping__book__author', 'clipping__book_id', 'clipping_id')
+    else:
+        clipping_list = User_Clipping.objects\
+            .filter(user_id=request.user.id)\
+            .order_by("-time")\
+            .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
+                    'clipping__book__author', 'clipping__book_id', 'clipping_id')
     paginator = Paginator(clipping_list, 30)
     page = request.GET.get('page')
     clippings = paginator.get_page(page)
