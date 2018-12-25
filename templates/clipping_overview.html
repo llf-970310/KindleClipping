@@ -116,7 +116,7 @@
             <div class="row">
                 <div class="input-field col m6 s12">
                     <i class="material-icons prefix">book</i>
-                    <input id="book_name" type="text" class="validate">
+                    <input id="book_name" type="text" class="validate autocomplete">
                     <label for="book_name">书名</label>
                 </div>
                 <div class="input-field col m6 s12">
@@ -165,6 +165,17 @@
             $('.sidenav').sidenav();
             $('.collapsible').collapsible();
             $('.modal').modal();
+
+            // 书籍名称自动填充
+            $('input.autocomplete').autocomplete({
+                data: {
+                    {% for author, books in author_book.items %}
+                        {% for book in books %}
+                            "{{ book.1 }}": null,
+                        {% endfor %}
+                    {% endfor %}
+                }
+            });
         });
 
         function setClippingID(id) {
