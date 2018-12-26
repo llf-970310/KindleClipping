@@ -17,7 +17,7 @@
             <div class="nav-wrapper blue">
                 <a href="{% url 'index' %}" class="brand-logo" style="margin-left: 10px;"><i class="material-icons">import_contacts</i>Kindle书摘管理</a>
                 <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <form class="search-wrapper" action="{% url 'overview' %}" method="POST">
+                <form class="search-wrapper hide-on-med-and-down" action="{% url 'overview' %}" method="POST">
                     {% csrf_token %}
                     <div class="input-field">
                         <input id="search" type="search" name="keyword" required>
@@ -41,6 +41,13 @@
     <ul id="nav-mobile" class="sidenav">
         <li id="overview"><a href="{% url 'overview' %}">总览</a></li>
         <li id="book"><a href="{% url 'book' %}">书籍库</a></li>
+        <form class="search-wrapper-mobile" action="{% url 'overview' %}" method="POST">
+            {% csrf_token %}
+            <div class="input-field">
+                <input id="search" type="search" name="keyword" required style="width: 70%; margin-left: 50px">
+                <label class="label-icon" for="search"><i class="material-icons" style="position: relative;top: 10px;">search</i></label>
+            </div>
+        </form>
         {% if user.is_authenticated %}
             <li><a class="waves-effect waves-light btn" href="{% url 'logout' %}?next={{ request.path }}">注销</a></li>
         {% else %}
