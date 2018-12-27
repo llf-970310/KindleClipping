@@ -8,8 +8,9 @@
         <div class="tile">
             <div class="text">
                 <h1>上传文件</h1>
-                <a href="#upload" class="modal-trigger"><img src="{% static 'img/a.png' %}"></a>
-                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork chicken meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+                <a href="#upload" class="modal-trigger"><img src="{% static 'img/a.jpg' %}"></a>
+                <p class="animate-text">将 Kindle 连接电脑，上传 Documents 文件夹下的 My Clippings.text 文件，
+                    系统会自动解析其中的文摘信息。</p>
             </div>
         </div>
 
@@ -17,8 +18,8 @@
             <div class="text">
                 <h1>总览</h1>
                 <a href="{% url 'overview' %}"><img src="{% static 'img/b.jpg' %}"></a>
-                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork
-                    chicken meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+                <p class="animate-text">对所有文摘进行管理，查看其内容、书籍作者、文摘位置以及添加时间，
+                    可根据作者进行筛选，同时提供一种优雅的导出方式。</p>
             </div>
         </div>
 
@@ -26,18 +27,15 @@
             <div class="text">
                 <h1>书籍库</h1>
                 <a href="{% url 'book' %}"><img src="{% static 'img/c.jpg' %}"></a>
-                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork
-                    chicken meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+                <p class="animate-text">根据书籍管理文摘，在该页面下，可以查看某一本书的内容简介，以及其中的所有文摘。</p>
             </div>
         </div>
 
         <div class="tile">
             <div class="text">
                 <h1>阅读统计</h1>
-                <a href="{% url 'statistics' %}"><img src="{% static 'img/d.png' %}"></a>
-                <p class="animate-text">Bacon ipsum dolor amet pork belly tri-tip turducken, pancetta bresaola pork
-                    chicken
-                    meatloaf. Flank sirloin strip steak prosciutto kevin turducken. </p>
+                <a href="{% url 'statistics' %}"><img src="{% static 'img/d.jpg' %}"></a>
+                <p class="animate-text">提供与文摘有关的一系列统计信息，在该页面，你将对自己的阅读情况有一个全面的了解。</p>
             </div>
         </div>
     </div>
