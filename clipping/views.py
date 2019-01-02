@@ -648,7 +648,16 @@ def get_ASIN(book_name):
     s = etree.HTML(data.text)
     asin = s.xpath('//*[@id="result_0"]/@data-asin')
     if len(asin) == 0:
-        return None
+        # Kindle分类中没有的话，在全部分类中找此图书
+        url = "https://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=亚马逊网站&url=search-alias%3Daps&field-keywords=" + book_name
+        data = requests.get(url=url, cookies=cookie, headers=header)
+        data.encoding = 'utf-8'
+        s = etree.HTML(data.text)
+        asin_all = s.xpath('//*[@id="result_0"]/@data-asin')
+        if len(asin_all) == 0:
+            return None
+        else:
+            return asin_all[0]
     return asin[0]
 
 def get_clipping_num_per_month(request, year):
