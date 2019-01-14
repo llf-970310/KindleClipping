@@ -604,17 +604,22 @@ def statistics(request):
 
 def upload_file(request):
     if request.method == "POST":  # 请求方法为POST时，进行处理
-        myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
-        if not myFile:
+        try:
+            myFile = request.FILES.get("file", None)  # 获取上传的文件，如果没有文件，则默认为None
+            if not myFile:
+                return False
+            else:
+                global file_name
+                file_name = myFile.name
+                destination = open('./upload_file/' + myFile.name, 'wb+')  # 打开特定的文件进行二进制的写操作
+                for chunk in myFile.chunks():  # 分块写入文件
+                    destination.write(chunk)
+                destination.close()
+                return True
+        except Exception as e:
+            print("Error: 上传文件出错")
+            print(e)
             return False
-        else:
-            global file_name
-            file_name = myFile.name
-            destination = open('./upload_file/' + myFile.name, 'wb+')  # 打开特定的文件进行二进制的写操作
-            for chunk in myFile.chunks():  # 分块写入文件
-                destination.write(chunk)
-            destination.close()
-            return True
 
 def get_file_content(filePath):
     with open(filePath, 'rb') as fp:

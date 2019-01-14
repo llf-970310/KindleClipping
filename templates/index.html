@@ -89,7 +89,7 @@
                         M.toast({html: '上传成功!'});
                         setTimeout("window.location.href='/clipping/'",1500);
                     } else if (data === "error") {
-                        M.toast({html: '请选择要上传的文件!'});
+                        M.toast({html: '上传失败!'});
                         $("#progress").hide();
                     } else if (data === "nouser") {
                         M.toast({html: '请先登录!'});
