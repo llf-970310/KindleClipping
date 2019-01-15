@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Clipping, User_Clipping, Book
@@ -610,8 +613,8 @@ def upload_file(request):
                 return False
             else:
                 global file_name
-                file_name = myFile.name
-                destination = open('./upload_file/' + myFile.name, 'wb+')  # 打开特定的文件进行二进制的写操作
+                file_name = "clipping_" + str(request.user.id) + ".txt"
+                destination = open('./upload_file/' + file_name, 'wb+')  # 打开特定的文件进行二进制的写操作
                 for chunk in myFile.chunks():  # 分块写入文件
                     destination.write(chunk)
                 destination.close()
