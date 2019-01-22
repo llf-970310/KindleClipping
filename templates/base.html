@@ -17,14 +17,16 @@
             <div class="nav-wrapper blue">
                 <a href="{% url 'index' %}" class="brand-logo" style="margin-left: 10px;"><i class="material-icons">import_contacts</i>Kindle书摘管理</a>
                 <a href="#" data-target="nav-mobile" class="sidenav-trigger"><i class="material-icons">menu</i></a>
-                <form class="search-wrapper hide-on-med-and-down" action="{% url 'overview' %}" method="POST">
-                    {% csrf_token %}
-                    <div class="input-field">
-                        <input id="search" type="search" name="keyword" required>
-                        <label class="label-icon" for="search"><i class="material-icons">search</i></label>
-                    </div>
-                </form>
                 <ul id="nav" class="right hide-on-med-and-down">
+                    <li>
+                        <form class="search-wrapper hide-on-med-and-down" action="{% url 'overview' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="input-field">
+                                <input id="search" type="search" name="keyword" required>
+                                <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+                            </div>
+                        </form>
+                    </li>
                     <li id="overview"><a href="{% url 'overview' %}">总览</a></li>
                     <li id="book"><a href="{% url 'book' %}">书籍库</a></li>
 {#                    <li id="author"><a href="{% url 'author' %}">作家</a></li>#}
@@ -91,9 +93,8 @@
         }
 
         .search-wrapper {
+            width: 90%;
             display: inline-block;
-            width: 15%;
-            margin-left: 66%;
         }
 
         .search-wrapper input {

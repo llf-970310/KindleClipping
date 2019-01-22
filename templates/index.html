@@ -76,6 +76,10 @@
         function upload() {
             var form_data = new FormData();
             var file_info =$('#file_upload')[0].files[0];
+            if (file_info.size > 10 * 1024 * 1024) {
+                M.toast({html: '文件过大，上传失败!'});
+                return;
+            }
             form_data.append('file',file_info);
             $("#progress").show();
             $.ajax({
