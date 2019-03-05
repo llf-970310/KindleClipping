@@ -67,6 +67,9 @@
     {% block content %} {% endblock %}
     {% block js %}{% endblock %}
 
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135634584-1"></script>
+
     <script>
         $(function () {
             $(".dropdown-trigger").dropdown({
@@ -83,6 +86,15 @@
                 $("#author").addClass("active");
             }
         })
+
+        // Google Analytics
+        window.dataLayer = window.dataLayer || [];
+        function gtag() {
+            dataLayer.push(arguments);
+        }
+        gtag('js', new Date());
+        gtag('config', 'UA-135634584-1');
+
     </script>
 
     <style>
