@@ -432,14 +432,14 @@ def overview(request):
     if request.method == "POST":
         keyword = request.POST.get("keyword")
         clipping_list = User_Clipping.objects\
-            .filter(Q(user_id=request.user.id),
+            .filter(Q(user_id=request.user.id), Q(is_deleted=0),
                     Q(clipping__content__contains=keyword) | Q(clipping__book__book_name__contains=keyword))\
             .order_by("-time")\
             .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
                     'clipping__book__author', 'clipping__book_id', 'clipping_id')
     else:
         clipping_list = User_Clipping.objects\
-            .filter(user_id=request.user.id)\
+            .filter(user_id=request.user.id, is_deleted=0)\
             .order_by("-time")\
             .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
                     'clipping__book__author', 'clipping__book_id', 'clipping_id')
@@ -464,7 +464,7 @@ def overview(request):
 def overview_by_book(request, id):
     # 得到全部文摘
     clipping_all = User_Clipping.objects\
-        .filter(user_id=request.user.id)\
+        .filter(user_id=request.user.id, is_deleted=0)\
         .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
                 'clipping__book__author', 'clipping__book_id', 'clipping_id')
 
@@ -495,7 +495,7 @@ def overview_by_book(request, id):
 @login_required
 def book(request):
     book_list = User_Clipping.objects\
-        .filter(user_id=request.user.id)\
+        .filter(user_id=request.user.id, is_deleted=0)\
         .values('clipping__book__book_name', 'clipping__book__author', 'clipping__book_id', 'clipping__book__ASIN').distinct()
     for book in book_list:
         book_name = book['clipping__book__book_name']
@@ -512,7 +512,7 @@ def book(request):
 @login_required
 def view_by_book(request, book_id):
     clipping_list = User_Clipping.objects\
-        .filter(user_id=request.user.id, clipping__book_id=book_id)\
+        .filter(user_id=request.user.id, clipping__book_id=book_id, is_deleted=0)\
         .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
                 'clipping__book__author', 'clipping_id')
     paginator = Paginator(clipping_list, 10)
@@ -585,7 +585,9 @@ def add_clipping(request):
 def del_clipping(request):
     clipping_id = request.POST.get('id')
     try:
-        User_Clipping.objects.filter(clipping_id=clipping_id, user_id=request.user.id).delete()
+        clipping = User_Clipping.objects.get(clipping_id=clipping_id, user_id=request.user.id)
+        clipping.is_deleted = 1
+        clipping.save()
         result = {'success': True}
     except:
         print("删除文摘失败，id为" + str(clipping_id))
@@ -595,7 +597,7 @@ def del_clipping(request):
 @login_required
 def author(request):
     author_list = User_Clipping.objects\
-        .filter(user_id=request.user.id)\
+        .filter(user_id=request.user.id, is_deleted=0)\
         .values('clipping__book__author').distinct()
     context = {'author_list': author_list, 'title': '作者库'}
     return render(request, 'author.html', context)
@@ -675,7 +677,7 @@ def get_clipping_num_per_month(request, year):
     try:
         for month in MONTHS:
             clipping_num = User_Clipping.objects\
-                .filter(user_id=request.user.id, time__year=year, time__month=month).count()
+                .filter(user_id=request.user.id, is_deleted=0, time__year=year, time__month=month).count()
             nums.append(clipping_num)
         result['success'] = True
         result['data'] = nums
