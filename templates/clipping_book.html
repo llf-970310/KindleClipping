@@ -32,7 +32,7 @@
             {% for clipping in clippings %}
                 <div class="card grey lighten-3 hoverable">
                     <div class="card-content">
-                        <span class="card-title">{{ clipping.clipping__book__book_name }}</span>
+                        <span class="card-title"><b>{{ clipping.clipping__book__book_name }}</b></span>
                         <blockquote>{{ clipping.clipping__content }}</blockquote>
                         <div class="valign-wrapper right">
                             <i class="tiny material-icons">person</i>&nbsp;
@@ -48,8 +48,17 @@
                         </div>
                     </div>
                     <div class="card-action">
-                        <a href="{% url 'export' clipping.clipping_id %}">导出</a>
-                        <a href="#del-modal" class="modal-trigger" onclick="setClippingID({{ clipping.clipping_id }})">删除</a>
+                        <a href="{% url 'export' clipping.clipping_id %}"><b>导出</b></a>
+                        <a href="#del-modal" class="modal-trigger" onclick="setClippingID({{ clipping.clipping_id }})"><b>删除</b></a>
+                        {% if clipping.is_collected == 0 %}
+                            <button class="icobutton right" style="color: #C0C1C3">
+                                <span class="tiny material-icons" id="{{ clipping.clipping_id }}">star</span>
+                            </button>
+                        {% else %}
+                            <button class="icobutton right checked" style="color: #FF9C00">
+                                <span class="tiny material-icons" id="{{ clipping.clipping_id }}">star</span>
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

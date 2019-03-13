@@ -429,20 +429,26 @@ def upload_img(request):
 
 @login_required
 def overview(request):
-    if request.method == "POST":
+    if request.method == "POST":  # keyword search
         keyword = request.POST.get("keyword")
         clipping_list = User_Clipping.objects\
             .filter(Q(user_id=request.user.id), Q(is_deleted=0),
                     Q(clipping__content__contains=keyword) | Q(clipping__book__book_name__contains=keyword))\
             .order_by("-time")\
             .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
-                    'clipping__book__author', 'clipping__book_id', 'clipping_id')
-    else:
+                    'clipping__book__author', 'clipping__book_id', 'clipping_id', 'is_collected')
+    else:  # all
         clipping_list = User_Clipping.objects\
             .filter(user_id=request.user.id, is_deleted=0)\
             .order_by("-time")\
             .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
-                    'clipping__book__author', 'clipping__book_id', 'clipping_id')
+                    'clipping__book__author', 'clipping__book_id', 'clipping_id', 'is_collected')
+    # collect clipping
+    collect = False
+    if "collect" in request.path:
+        clipping_list = clipping_list.filter(is_collected=1)
+        collect = True
+
     paginator = Paginator(clipping_list, 30)
     page = request.GET.get('page')
     clippings = paginator.get_page(page)
@@ -457,7 +463,7 @@ def overview(request):
         if [book_id, book_name] not in author_book[author]:
             author_book[author].append([book_id, book_name])
 
-    context = {'clippings': clippings, 'author_book': author_book, 'title': '总览'}
+    context = {'clippings': clippings, 'author_book': author_book, 'title': '总览', 'collect_page': collect}
     return render(request, 'clipping_overview.html', context)
 
 @login_required
@@ -465,8 +471,9 @@ def overview_by_book(request, id):
     # 得到全部文摘
     clipping_all = User_Clipping.objects\
         .filter(user_id=request.user.id, is_deleted=0)\
+        .order_by('-time')\
         .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
-                'clipping__book__author', 'clipping__book_id', 'clipping_id')
+                'clipping__book__author', 'clipping__book_id', 'clipping_id', 'is_collected')
 
     author_book = {}
     clipping_book = []
@@ -513,8 +520,9 @@ def book(request):
 def view_by_book(request, book_id):
     clipping_list = User_Clipping.objects\
         .filter(user_id=request.user.id, clipping__book_id=book_id, is_deleted=0)\
+        .order_by('-time')\
         .values('time', 'clipping__content', 'clipping__location','clipping__book__book_name',
-                'clipping__book__author', 'clipping_id')
+                'clipping__book__author', 'clipping_id', 'is_collected')
     paginator = Paginator(clipping_list, 10)
     page = request.GET.get('page')
     clippings = paginator.get_page(page)
@@ -592,6 +600,20 @@ def del_clipping(request):
     except:
         print("删除文摘失败，id为" + str(clipping_id))
         result = {'success': False}
+    return HttpResponse(json.dumps(result), content_type="application/json")
+
+@login_required
+def modify_collect_status(request):
+    if request.method == "POST":
+        try:
+            clipping_id = request.POST.get("id")
+            clipping = User_Clipping.objects.get(clipping_id=clipping_id, user_id=request.user.id)
+            clipping.is_collected ^= 1
+            clipping.save()
+            result = {'success': True}
+        except:
+            print("收藏文摘失败，id为" + str(clipping_id))
+            result = {'success': False}
     return HttpResponse(json.dumps(result), content_type="application/json")
 
 @login_required

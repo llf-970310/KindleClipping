@@ -5,10 +5,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
+
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js"></script>
     <script type="text/javascript" src="{% static 'js/materialize.min.js' %}"></script>
+
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="{% static 'css/materialize.min.css' %}" media="screen,projection" />
+    <link type="text/css" rel="stylesheet" href="{% static 'css/star_animation.css' %}" />
+
     <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
@@ -69,6 +73,10 @@
 
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-135634584-1"></script>
+
+    <!-- mo.js -->
+    <script src="https://cdn.jsdelivr.net/mojs/0.265.6/mo.min.js"></script>
+    <script type="text/javascript" src="{% static 'js/star_animation.js' %}"></script>
 
     <script>
         $(function () {

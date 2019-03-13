@@ -15,6 +15,7 @@ class User_Clipping(models.Model):
     clipping = models.ForeignKey('Clipping', on_delete=models.CASCADE)
     time = models.DateTimeField('添加时间')
     is_deleted = models.BooleanField('是否删除', default=False)
+    is_collected = models.BooleanField('是否收藏', default=False)
 
 class Book(models.Model):
     ASIN = models.CharField('ASIN', max_length=10, null=True)

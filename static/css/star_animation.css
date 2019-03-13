@@ -1,0 +1,22 @@
+/* Icons button */
+.icobutton {
+    position: relative;
+    margin: 0;
+    padding: 0;
+    color: #c0c1c3;
+    border: 0;
+    background: none;
+    overflow: visible;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.icobutton .fa {
+    display: block;
+    padding: 0 0.1em;
+}
+
+.icobutton:hover,
+.icobutton:focus {
+    outline: none;
+    background: none;
+}
