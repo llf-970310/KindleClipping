@@ -535,7 +535,7 @@ def view_by_book(request, book_id):
     book_info['img'] = "http://s3.cn-north-1.amazonaws.com.cn/sitbweb-cn/content/%s/images/cover.jpg" % ASIN
 
     # get book summary
-    url = "https://api.douban.com/v2/book/search?q=" + book_info['book_name']
+    url = "https://api.douban.com/v2/book/search?apikey=0df993c66c0c636e29ecbb5344252a4a&q=" + book_info['book_name']
     data = requests.get(url=url, headers=get_header()).text
     json_data = json.loads(data)
     book_info['summary'] = json_data['books'][0]['summary']
