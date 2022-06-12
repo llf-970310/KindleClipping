@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-
+import random
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Clipping, User_Clipping, Book
@@ -21,6 +21,7 @@ from lxml import etree
 from PIL import Image, ImageDraw, ImageFont
 from io import BytesIO
 from aip import AipOcr
+from werobot import WeRoBot
 
 # 切换输出流编码为utf-8
 if sys.stdout.encoding != 'UTF-8':
@@ -707,3 +708,26 @@ def get_clipping_num_per_month(request, year):
         result['success'] = False
 
     return HttpResponse(json.dumps(result))
+
+wx_robot = WeRoBot(token='lf4697323')
+@wx_robot.text
+def wx_reply(message):
+    ret = ""
+    print("[wx_reply] receive text message: " + message.content)
+
+    if message.content == "书摘":
+        clipping_list = User_Clipping.objects \
+            .filter(user_id=1, is_deleted=0) \
+            .order_by("-time") \
+            .values('time', 'clipping__content', 'clipping__location', 'clipping__book__book_name',
+                    'clipping__book__author', 'clipping__book_id', 'clipping_id', 'is_collected')
+
+        random_clipping = random.sample(list(clipping_list), 5)
+        for clipping in random_clipping:
+            ret += clipping["clipping__content"] + "————《" + clipping["clipping__book__book_name"] + "》\n"
+            ret += "\n"
+    else:
+        ret = "不支持的操作"
+
+    return ret
+

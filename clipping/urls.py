@@ -1,5 +1,8 @@
+from django.conf.urls import url
 from django.urls import path
+from clipping.views import wx_robot
 from . import views
+from werobot.contrib.django import make_view
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -18,4 +21,5 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('statistics/', views.statistics, name='statistics'),
     path('statistics/clippingNum/<int:year>', views.get_clipping_num_per_month),
+    url('^robot/', make_view(wx_robot)),
 ]
