@@ -379,7 +379,7 @@ def upload_clipping(request):
                 count = 4
                 if flag:
                     # print(clipping)
-                    book_tmp = Book.objects.get_or_create(book_name=book['name'], defaults={'author': book['author']})
+                    book_tmp = Book.objects.get_or_create(book_origin_name=book['name'], defaults={'author': book['author'], 'book_name': book['name']})
                     # clip = Clipping.objects.get_or_create(content=clipping['content'], book_name=clipping['name'], location=clipping['location'])
                     # 有隐患，同一位置后面上传的用户会把前面用户的内容替换掉，当前无法解决此问题
                     clip = Clipping.objects.update_or_create(book_id=book_tmp[0].id, location=clipping['location'], defaults={'content': clipping['content']})
@@ -511,6 +511,7 @@ def book(request):
             ASIN = book['clipping__book__ASIN']
         else:
             ASIN = get_ASIN(book_name)
+            # print("asin: " + str(ASIN))
             Book.objects.filter(id=book['clipping__book_id']).update(ASIN=ASIN)
         book['img_backup'] = "http://z2-ec2.images-amazon.com/images/P/%s.jpg" % ASIN
         book['img'] = "http://s3.cn-north-1.amazonaws.com.cn/sitbweb-cn/content/%s/images/cover.jpg" % ASIN
