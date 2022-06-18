@@ -671,6 +671,7 @@ def get_header():
     return header
 
 def get_ASIN(book_name):
+    asin_xpath = '//*[@id="search"]/div[1]/div[1]/div/span[3]/div[2]/div[2]/@data-asin'
     header = get_header()
     with requests.session() as s:
         req = s.get('https://www.amazon.cn/', headers=header)
@@ -679,14 +680,14 @@ def get_ASIN(book_name):
     data = requests.get(url=url, cookies=cookie, headers=header)
     data.encoding = 'utf-8'
     s = etree.HTML(data.text)
-    asin = s.xpath('//*[@id="result_0"]/@data-asin')
+    asin = s.xpath(asin_xpath)
     if len(asin) == 0:
         # Kindle分类中没有的话，在全部分类中找此图书
         url = "https://www.amazon.cn/s/ref=nb_sb_noss?__mk_zh_CN=亚马逊网站&url=search-alias%3Daps&field-keywords=" + book_name
         data = requests.get(url=url, cookies=cookie, headers=header)
         data.encoding = 'utf-8'
         s = etree.HTML(data.text)
-        asin_all = s.xpath('//*[@id="result_0"]/@data-asin')
+        asin_all = s.xpath(asin_xpath)
         if len(asin_all) == 0:
             return None
         else:
