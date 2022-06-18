@@ -19,5 +19,5 @@ class User_Clipping(models.Model):
 
 class Book(models.Model):
     ASIN = models.CharField('ASIN', max_length=10, null=True)
-    book_name = models.CharField('书名', max_length=200)
-    author = models.CharField('作者', max_length=50)
+    book_name = models.CharField('书名', max_length=256)
+    author = models.CharField('作者', max_length=256)
