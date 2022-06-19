@@ -135,3 +135,7 @@ TEMPLATE_DIRS = (os.path.join(BASE_DIR,  'templates'),)
 LOGOUT_REDIRECT_URL = '/clipping'
 LOGIN_REDIRECT_URL = '/clipping'
 LOGIN_URL = '/clipping/login'
+
+WECHAT_APP_ID = 'wx07b6fc7756799718'
+WECHAT_SECRET = ''
+

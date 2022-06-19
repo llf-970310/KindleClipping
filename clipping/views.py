@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import random
+
+from django.conf import settings
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from werobot.replies import ImageReply
+
 from .models import Clipping, User_Clipping, Book
 from django.contrib.auth.models import User
 from django.forms.models import model_to_dict
@@ -550,8 +554,9 @@ def view_by_book(request, book_id):
     context = {'clippings': clippings, 'title': '书籍库', 'book_info': book_info}
     return render(request, 'clipping_book.html', context)
 
-@login_required
-def export_clipping(request, clipping_id):
+
+# save clipping img
+def save_clipping(clipping_id):
     clipping = Clipping.objects.filter(id=clipping_id).values('content', 'book__book_name', 'book__ASIN')[0]
     ASIN = clipping['book__ASIN']
     img_url = [
@@ -562,14 +567,19 @@ def export_clipping(request, clipping_id):
     # 每25个字插入一个换行符，以适应分享图片的生成
     content = '\n'.join(content[i:i+25] for i in range(0,len(content),25))
 
-
     # Img('upload_file/').save2(clipping['book__book_name'], content, '', clipping_id)
     Img('upload_file/').save3(clipping['book__book_name'], content, img_url, clipping_id)
-    file=open('upload_file/' + str(clipping_id) + '.png','rb')
+
+
+@login_required
+def export_clipping(request, clipping_id):
+    save_clipping(clipping_id)
+    file = open('upload_file/' + str(clipping_id) + '.png', 'rb')
     response = HttpResponse(file)
     response['Content-Type']='application/octet-stream'
     response['Content-Disposition']='attachment;filename="clipping.png"'
     return response
+
 
 @login_required
 def add_clipping(request):
@@ -711,25 +721,37 @@ def get_clipping_num_per_month(request, year):
 
     return HttpResponse(json.dumps(result))
 
-wx_robot = WeRoBot(token='lf4697323')
-@wx_robot.text
+
+wx_robot = WeRoBot(token='lf4697323', app_id=settings.WECHAT_APP_ID, app_secret=settings.WECHAT_SECRET)
+@wx_robot.filter("书摘")
 def wx_reply(message):
     ret = ""
     print("[wx_reply] receive text message: " + message.content)
 
-    if message.content == "书摘":
-        clipping_list = User_Clipping.objects \
-            .filter(user_id=1, is_deleted=0) \
-            .order_by("-time") \
-            .values('time', 'clipping__content', 'clipping__location', 'clipping__book__book_name',
-                    'clipping__book__author', 'clipping__book_id', 'clipping_id', 'is_collected')
+    # todo: 微信号绑定，获取指定用户书摘
+    clipping_list = User_Clipping.objects \
+        .filter(user_id=1, is_deleted=0) \
+        .order_by("-time") \
+        .values('time', 'clipping__content', 'clipping__location', 'clipping__book__book_name',
+                'clipping__book__author', 'clipping__book_id', 'clipping_id', 'is_collected')
 
-        random_clipping = random.sample(list(clipping_list), 5)
-        for clipping in random_clipping:
-            ret += clipping["clipping__content"] + "————《" + clipping["clipping__book__book_name"] + "》\n"
-            ret += "\n"
-    else:
-        ret = "不支持的操作"
+    random_clipping = random.sample(list(clipping_list), 5)
+    for clipping in random_clipping:
+        ret += str(clipping["clipping_id"]) + "\n"
+        ret += clipping["clipping__content"] + "————《" + clipping["clipping__book__book_name"] + "》\n"
+        ret += "\n"
 
     return ret
 
+@wx_robot.filter(re.compile("书摘-(\d+)"))
+def wx_reply(message, session, match):
+    print("[wx_reply] receive text message: " + message.content)
+
+    clipping_id = match.group(1)
+    # todo: 书摘归属性校验
+    save_clipping(clipping_id)
+    # upload to wx
+    img_file = open('upload_file/' + str(clipping_id) + '.png', 'rb')
+    upload_ret = wx_robot.client.upload_media("image", img_file)
+
+    return ImageReply(message=message, media_id=upload_ret["media_id"])
